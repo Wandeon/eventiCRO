@@ -59,7 +59,7 @@
 
 - **Behavior**
 
-  - Validate body (Zod) and **reject if **``** is non‑empty**.
+  - Validate body (Zod) and reject if `honeypot` is non‑empty.
   - Verify `captcha_token` with **Friendly Captcha** server endpoint using secret (see §1.3).
   - Insert payload into `submissions(payload)` with `status='pending'`.
   - Do **not** derive or geocode here; enrichment happens **asynchronously** (n8n or admin action) respecting Nominatim limits.
