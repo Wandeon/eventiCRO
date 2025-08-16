@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "pretest": "node ./scripts/check-api-base-url.mjs",
     "test": "pnpm run test:integration && pnpm run test:e2e",
     "test:integration": "schemathesis run --checks all --rate-limit=50 --hypothesis-max-examples=50 --base-url=$API_BASE_URL $API_BASE_URL/openapi.json",
     "test:e2e": "playwright test",
