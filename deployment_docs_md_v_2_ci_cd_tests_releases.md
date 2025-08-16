@@ -7,7 +7,7 @@
 > - `project-baseline-index.md` → PR‑1, PR‑2, PR‑9
 > - `openapi/openapi.yaml` & `api/openapi.ts`
 > - `security-headers-csp.md`
-> - `observability.md`, `backups-runbook.md`, `tailscale-networking.md`, `infra-vps-runbook.md`
+> - [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md), `backups-runbook.md`, `tailscale-networking.md`, `infra-vps-runbook.md`
 
 ---
 

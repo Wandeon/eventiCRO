@@ -7,7 +7,7 @@
 > - `infra-vps-runbook.md` → §§6
 > - `tailscale-networking.md` → ACLs, reverse proxy patterns
 > - `backups-runbook.md` → GDPR purge jobs (can be scheduled via n8n)
-> - `observability.md` → metrics/logs/heartbeats
+> - [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md) → metrics/logs/heartbeats
 
 ---
 

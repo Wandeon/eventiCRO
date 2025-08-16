@@ -6,7 +6,7 @@
 >
 > - `openapi/openapi.yaml (v1)` — source of truth for request/response shapes.
 > - `deployment-docs.md (v2)` — CI tests against `/api/openapi.json`.
-> - `observability.md (v1)` — `/api/health` contract.
+> - [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md) — `/api/health` contract.
 > - `gpu-worker-architecture.md (v1)` — `ProcessedEvent` producers.
 > - `security-headers-csp.md (v1)` — public hardening.
 

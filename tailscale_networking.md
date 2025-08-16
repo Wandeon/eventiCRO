@@ -200,6 +200,6 @@ Point **Uptime Kuma** to:
 ## 11) Security notes
 
 - Avoid exposing any tailnet services to the internet; when necessary, restrict by auth and IP.
-- Prefer **short‑lived** tokens/keys and rotate them (documented in `backups-runbook.md` and `observability.md`).
+- Prefer **short‑lived** tokens/keys and rotate them (documented in `backups-runbook.md` and [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md)).
 - Review ACLs after any new service is added.
 

@@ -8,7 +8,7 @@
 > - `tailscale-networking.md` → ACLs, hostnames, private bindings
 > - `security-headers-csp.md` → Caddy hardening (HTTPS)
 > - `backups-runbook.md` → WAL‑G + MinIO
-> - `observability.md` → OTel → Prom/Loki/Grafana; Sentry
+- [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md) → OTel → Prom/Loki/Grafana; Sentry
 > - `gpu-worker-architecture.md` → n8n queue workers on GPU‑01
 > - `deployment-docs.md` → CI/CD and tests
 
@@ -249,7 +249,7 @@ Follow the official **getsentry/self-hosted** install. After setup:
 
 ## I) Observability stack (VPS‑01)
 
-Use `observability.md`:
+Use [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md):
 
 - Create `/srv/observability/*.yml` as specified and `docker compose up -d` there.
 - Keep **Grafana/Prometheus/Loki** on loopback/tailnet; proxy via Caddy only if you need public access.
