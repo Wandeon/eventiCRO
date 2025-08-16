@@ -282,6 +282,10 @@ paths:
             type: string
             enum: [pending, approved, rejected]
             default: pending
+        - name: q
+          in: query
+          schema:
+            type: string
         - $ref: '#/components/parameters/cursor'
         - $ref: '#/components/parameters/limit'
       responses:
@@ -657,6 +661,9 @@ components:
           type: string
           enum: [pending, approved, rejected]
         created_at: { type: string, format: date-time }
+        reviewer: { type: string, nullable: true }
+        reviewed_at: { type: string, format: date-time, nullable: true }
+        reason: { type: string, nullable: true }
         payload:
           type: object
           additionalProperties: true
