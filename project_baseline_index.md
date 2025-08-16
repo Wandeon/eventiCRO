@@ -57,7 +57,7 @@
 - **Uptime Kuma** — synthetic checks. **Host:** VPS-01.
 - **Portainer** — optional Docker management UI (protect behind auth/VPN). **Host:** VPS-01.
 - **Netdata** — optional node/system monitoring. **Host:** VPS-01.
-- **Gotenberg *************or************* WeasyPrint** — HTML→PDF service. Pick one; default to **Gotenberg**. **Host:** VPS-01.
+- **Gotenberg or WeasyPrint** — HTML→PDF service. Pick one; default to **Gotenberg**. **Host:** VPS-01.
 - **Crawl4AI** — crawler/extractor for ingestion enrichment. **Host:** GPU-01 (or VPS-01 if light use).
 - **SearXNG (optional)** — meta-search for research/enrichment; restrict to VPN/admin. **Host:** VPS-01.
 - **Qdrant (optional)** — vector store for semantic de-duplication/recommendations (post-MVP). **Host:** VPS-01.
