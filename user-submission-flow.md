@@ -2,7 +2,7 @@
 
 > **Scope:** End‑to‑end flow for accepting public event submissions, validating and rate‑limiting them, protecting against abuse (captcha + heuristics), placing them into a **moderation queue**, and promoting approved items into normalized tables (`events`, `venues`, `organizers`). Aligns with:
 >
-> - `core-data-model-api.md (v2)` — tables (`submissions`, `events`, `venues`, `organizers`) and ingestion upserts.
+> - `core_data_model_api.md (v2)` — tables (`submissions`, `events`, `venues`, `organizers`) and ingestion upserts.
 > - `frontend-ui-pwa.md (v2)` — Submit form UI, Zod validation, Workbox Background Sync.
 > - `security-headers-csp.md (v1)` — CORS/CSP rules.
 > - `deployment-docs.md (v2)` — tests & `/api/health`.

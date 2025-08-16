@@ -218,11 +218,11 @@ cd /srv/core && docker compose up -d
 
 ## G) Postgres / Supabase
 
-> You can run **managed Supabase** (simpler) or **self‑hosted** (advanced). The schema in `core-data-model-api.md` works with plain Postgres. If you need Auth + Storage, either use managed Supabase or the official self‑hosted stack.
+> You can run **managed Supabase** (simpler) or **self‑hosted** (advanced). The schema in `core_data_model_api.md` works with plain Postgres. If you need Auth + Storage, either use managed Supabase or the official self‑hosted stack.
 
 ### Option 1 — Plain Postgres (recommended for MVP)
 
-Use your hosted Postgres (from Supabase managed or your own PG container). Ensure extensions from `core-data-model-api.md` are enabled:
+Use your hosted Postgres (from Supabase managed or your own PG container). Ensure extensions from `core_data_model_api.md` are enabled:
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
