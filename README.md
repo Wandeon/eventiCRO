@@ -36,6 +36,13 @@ pnpm dev
 
 Then open the provided local URL in your browser to view the app.
 
+## API Overview
+
+- `GET /events` – list events with cursor pagination and optional radius filter
+- `POST /api/submit` – submit events with Friendly Captcha and a honeypot field
+- `POST /ingest` – authenticated ingestion of processed events
+- Admin routes for feature flag management and submission moderation
+
 ## Further Documentation
 
 - [Deployment guide](deployment-docs.md) – CI/CD,
