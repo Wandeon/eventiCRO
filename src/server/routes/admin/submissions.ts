@@ -1,6 +1,6 @@
-import { Hono } from 'hono';
-import db from '../../db/client';
-import requireAuth from '../../middleware/auth';
+import { Hono } from "hono";
+import db from "../../db/client";
+import requireAuth from "../../middleware/auth";
 
 interface SubmissionRow {
   id: string;
@@ -14,18 +14,18 @@ interface SubmissionRow {
 
 const route = new Hono();
 
-route.use('*', requireAuth);
+route.use("*", requireAuth);
 
-route.get('/', async (c) => {
-  const status = c.req.query('status') ?? 'pending';
-  const q = c.req.query('q') ?? '';
-  const limitParam = parseInt(c.req.query('limit') || '50', 10);
+route.get("/", async (c) => {
+  const status = c.req.query("status") ?? "pending";
+  const q = c.req.query("q") ?? "";
+  const limitParam = parseInt(c.req.query("limit") || "50", 10);
   const limit = Math.min(isNaN(limitParam) ? 50 : limitParam, 50);
-  const cursor = c.req.query('cursor');
+  const cursor = c.req.query("cursor");
   let cursorTime: string | null = null;
   let cursorId: string | null = null;
   if (cursor) {
-    const [t, id] = cursor.split('|');
+    const [t, id] = cursor.split("|");
     if (t && id) {
       cursorTime = t;
       cursorId = id;
@@ -36,7 +36,7 @@ route.get('/', async (c) => {
     SELECT id, created_at, status, payload, reviewer, reviewed_at, reason
     FROM submissions
     WHERE status = ${status}
-    ${q ? db`AND (payload->>'title' ILIKE ${'%' + q + '%'} OR payload->>'url' ILIKE ${'%' + q + '%'})` : db``}
+    ${q ? db`AND (payload->>'title' ILIKE ${"%" + q + "%"} OR payload->>'url' ILIKE ${"%" + q + "%"})` : db``}
     ${cursorTime ? db`AND (created_at, id) > (${cursorTime}, ${cursorId})` : db``}
     ORDER BY created_at, id
     LIMIT ${limit + 1}
@@ -52,15 +52,15 @@ route.get('/', async (c) => {
   return c.json({ items: rows, next_cursor: nextCursor });
 });
 
-route.post('/:id/approve', async (c) => {
-  const id = c.req.param('id');
-  const reviewer = (c.get('user') as any)?.sub ?? 'admin';
+route.post("/:id/approve", async (c) => {
+  const id = c.req.param("id");
+  const reviewer = (c.get("user") as any)?.sub ?? "admin";
 
   const submission = await db<SubmissionRow[]>`
     SELECT id, payload FROM submissions WHERE id = ${id}
   `;
   if (submission.length === 0) {
-    return c.text('Not Found', 404);
+    return c.text("Not Found", 404);
   }
   const payload = submission[0].payload as Record<string, any>;
 
@@ -92,27 +92,33 @@ route.post('/:id/approve', async (c) => {
   `;
 
   if (payload.submitter_email) {
-    console.log(`Submission ${id} approved; notifying ${payload.submitter_email}`);
+    console.log(
+      `Submission ${id} approved; notifying ${payload.submitter_email}`,
+    );
   }
 
   return c.json({ promoted_event_id: promotedEventId });
 });
 
-route.post('/:id/reject', async (c) => {
-  const id = c.req.param('id');
-  const reviewer = (c.get('user') as any)?.sub ?? 'admin';
+route.post("/:id/reject", async (c) => {
+  const id = c.req.param("id");
+  const reviewer = (c.get("user") as any)?.sub ?? "admin";
 
   let reason: string | undefined;
   try {
     const body = await c.req.json();
-    if (body && typeof body.reason === 'string') {
+    if (body && typeof body.reason === "string") {
       reason = body.reason;
     }
-  } catch {}
+  } catch {
+    // ignore JSON parse errors
+  }
 
-  const submission = await db<SubmissionRow[]>`SELECT payload FROM submissions WHERE id = ${id}`;
+  const submission = await db<
+    SubmissionRow[]
+  >`SELECT payload FROM submissions WHERE id = ${id}`;
   if (submission.length === 0) {
-    return c.text('Not Found', 404);
+    return c.text("Not Found", 404);
   }
   const payload = submission[0].payload as Record<string, any>;
 
@@ -123,11 +129,12 @@ route.post('/:id/reject', async (c) => {
   `;
 
   if (payload.submitter_email) {
-    console.log(`Submission ${id} rejected; notifying ${payload.submitter_email}`);
+    console.log(
+      `Submission ${id} rejected; notifying ${payload.submitter_email}`,
+    );
   }
 
   return c.body(null, 204);
 });
 
 export default route;
-
