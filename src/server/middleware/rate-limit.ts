@@ -14,41 +14,36 @@ interface Rule {
   key: (c: Context) => string;
 }
 
-async function tokenBucket(key: string, limit: number, window: number) {
-  const now = Date.now();
-  const rate = limit / (window * 1000); // tokens per ms
-  const data = await redis.get(key);
-  let tokens = limit;
-  let last = now;
-  if (data) {
-    try {
-      const parsed = JSON.parse(data);
-      tokens = parsed.tokens;
-      last = parsed.last;
-    } catch {
-      tokens = limit;
-      last = now;
-    }
-    const delta = now - last;
-    tokens = Math.min(limit, tokens + delta * rate);
+async function applyLimit(key: string, limit: number, window: number) {
+  const res = await redis
+    .multi()
+    .incr(key)
+    .ttl(key)
+    .exec();
+  const count = Number(res?.[0]?.[1] ?? 0);
+  let ttl = Number(res?.[1]?.[1] ?? -1);
+  if (ttl < 0) {
+    await redis.expire(key, window);
+    ttl = window;
   }
-  const allowed = tokens >= 1;
-  if (allowed) {
-    tokens -= 1;
-  }
-  await redis.set(key, JSON.stringify({ tokens, last: now }), 'EX', window);
-  return { allowed, remaining: Math.floor(tokens) };
+  const remaining = Math.max(0, limit - count);
+  return { count, ttl, remaining };
 }
 
 function rateLimit(rule: Rule) {
   return async (c: Context, next: Next) => {
-    const { allowed, remaining } = await tokenBucket(rule.key(c), rule.limit, rule.window);
+    const key = rule.key(c);
+    const { count, ttl, remaining } = await applyLimit(key, rule.limit, rule.window);
+
     c.header('X-RateLimit-Limit', rule.limit.toString());
     c.header('X-RateLimit-Remaining', remaining.toString());
-    if (!allowed) {
-      c.header('Retry-After', rule.window.toString());
-      return c.text('Too Many Requests', 429);
+    c.header('X-RateLimit-Reset', ttl.toString());
+
+    if (count > rule.limit) {
+      c.header('Retry-After', ttl.toString());
+      return c.json({ error: 'TooManyRequests', message: 'Rate limit exceeded' }, 429);
     }
+
     await next();
   };
 }
