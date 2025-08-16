@@ -2,6 +2,22 @@ import { Hono } from "hono";
 import db from "../../db/client";
 import requireAuth from "../../middleware/auth";
 
+interface AuthUser {
+  sub: string;
+}
+
+interface SubmissionPayload {
+  title: string;
+  description?: string | null;
+  start_time: string;
+  end_time?: string | null;
+  city?: string | null;
+  url?: string | null;
+  image_url?: string | null;
+  price?: string | null;
+  submitter_email?: string | null;
+}
+
 interface SubmissionRow {
   id: string;
   created_at: Date;
@@ -54,7 +70,7 @@ route.get("/", async (c) => {
 
 route.post("/:id/approve", async (c) => {
   const id = c.req.param("id");
-  const reviewer = (c.get("user") as any)?.sub ?? "admin";
+  const reviewer = (c.get("user") as AuthUser)?.sub ?? "admin";
 
   const submission = await db<SubmissionRow[]>`
     SELECT id, payload FROM submissions WHERE id = ${id}
@@ -62,7 +78,7 @@ route.post("/:id/approve", async (c) => {
   if (submission.length === 0) {
     return c.text("Not Found", 404);
   }
-  const payload = submission[0].payload as Record<string, any>;
+  const payload = submission[0].payload as SubmissionPayload;
 
   const eventRows = await db<{ id: string }[]>`
     INSERT INTO events (title, description, start_time, end_time, city, url, image_url, price, created_at, updated_at, source, source_id)
@@ -102,7 +118,7 @@ route.post("/:id/approve", async (c) => {
 
 route.post("/:id/reject", async (c) => {
   const id = c.req.param("id");
-  const reviewer = (c.get("user") as any)?.sub ?? "admin";
+  const reviewer = (c.get("user") as AuthUser)?.sub ?? "admin";
 
   let reason: string | undefined;
   try {
@@ -120,7 +136,7 @@ route.post("/:id/reject", async (c) => {
   if (submission.length === 0) {
     return c.text("Not Found", 404);
   }
-  const payload = submission[0].payload as Record<string, any>;
+  const payload = submission[0].payload as SubmissionPayload;
 
   await db`
     UPDATE submissions
