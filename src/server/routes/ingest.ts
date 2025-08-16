@@ -1,67 +1,95 @@
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
-import { db } from '../db/client';
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { db } from "../db/client";
 
 const ingestSecret = process.env.INGEST_SECRET;
 if (!ingestSecret) {
-  throw new Error('INGEST_SECRET is not set');
+  throw new Error("INGEST_SECRET is not set");
 }
 
 const route = new Hono();
+
+interface IngestItem {
+  title: string;
+  description?: string | null;
+  start_time: string;
+  end_time?: string | null;
+  venue_name?: string | null;
+  address?: string | null;
+  city?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  organizer_name?: string | null;
+  organizer_website?: string | null;
+  url?: string | null;
+  image_url?: string | null;
+  price?: string | null;
+  source?: string | null;
+  source_id?: string | null;
+}
+
+interface IngestResult {
+  status: "inserted" | "updated" | "skipped" | "failed";
+  id?: string;
+  message?: string;
+}
 
 function normalizeCity(city?: string | null) {
   if (!city) return null;
   const trimmed = city.trim();
   if (!trimmed) return null;
-  return trimmed
-    .toLowerCase()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return trimmed.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-route.post('/', async (c) => {
+route.post("/", async (c) => {
   const header =
-    c.req.header('ingest_secret') || c.req.header('x-ingest-secret');
+    c.req.header("ingest_secret") || c.req.header("x-ingest-secret");
   if (!header || header !== ingestSecret) {
-    return c.text('Unauthorized', 401);
+    return c.text("Unauthorized", 401);
   }
 
-  let items: any;
+  let items: IngestItem[];
   try {
-    items = await c.req.json();
+    items = await c.req.json<IngestItem[]>();
   } catch {
-    throw new HTTPException(400, { message: 'Invalid JSON' });
+    throw new HTTPException(400, { message: "Invalid JSON" });
   }
 
   if (!Array.isArray(items) || items.length === 0) {
-    throw new HTTPException(400, { message: 'Expected non-empty array' });
+    throw new HTTPException(400, { message: "Expected non-empty array" });
   }
 
-  const results: any[] = [];
+  const results: IngestResult[] = [];
   const cutoff = Date.now() - 365 * 24 * 60 * 60 * 1000;
 
   for (const item of items) {
     try {
       if (!item.title || !item.start_time) {
-        results.push({ status: 'skipped', message: 'Missing title or start_time' });
+        results.push({
+          status: "skipped",
+          message: "Missing title or start_time",
+        });
         continue;
       }
 
       const start = new Date(item.start_time);
       if (isNaN(start.getTime())) {
-        results.push({ status: 'skipped', message: 'Invalid start_time' });
+        results.push({ status: "skipped", message: "Invalid start_time" });
         continue;
       }
       if (start.getTime() < cutoff) {
-        results.push({ status: 'skipped', message: 'start_time too old' });
+        results.push({ status: "skipped", message: "start_time too old" });
         continue;
       }
 
       const end = item.end_time ? new Date(item.end_time) : null;
       const city = normalizeCity(item.city);
       const url = item.url ? String(item.url).toLowerCase() : null;
-      const imageUrl = item.image_url ? String(item.image_url).toLowerCase() : null;
+      const imageUrl = item.image_url
+        ? String(item.image_url).toLowerCase()
+        : null;
 
-      const source = item.source || 'crawl';
+      const source = item.source || "crawl";
       const sourceId = item.source_id || url;
 
       const result = await db.begin(async (tx) => {
@@ -112,9 +140,16 @@ route.post('/', async (c) => {
         return ev;
       });
 
-      results.push({ status: result.inserted ? 'inserted' : 'updated', id: result.id });
-    } catch (err: any) {
-      results.push({ status: 'failed', message: err.message });
+      results.push({
+        status: result.inserted ? "inserted" : "updated",
+        id: result.id,
+      });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        results.push({ status: "failed", message: err.message });
+      } else {
+        results.push({ status: "failed", message: "Unknown error" });
+      }
     }
   }
 
