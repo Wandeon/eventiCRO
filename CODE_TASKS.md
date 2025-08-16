@@ -1,75 +1,71 @@
 # Code Tasks
 
 ## package.json
+- [ ] Tests require pnpm and API_BASE_URL → install pnpm (`corepack enable pnpm && pnpm install`) and run tests with `API_BASE_URL=http://localhost:8787 npm test`
 
-- [ ] Tests rely on pnpm, which isn't installed offline → install with `corepack enable pnpm && pnpm install`
-- [ ] `npm test` requires API_BASE_URL → run with `API_BASE_URL=http://localhost:8787 pnpm test`
+## scripts/check-api-base-url.mjs
+- [ ] Script throws when `API_BASE_URL` is unset → default to local URL:
+  ```diff
+  - throw new Error("API_BASE_URL env var is required");
+  + const base = process.env.API_BASE_URL ?? "http://localhost:8787";
+  ```
 
-## src/modules.d.ts
+## src/lib/map.ts
+- [ ] `L.map` expects one argument and tile layer types are `unknown` → cast options and marker:
+  ```diff
+  - const map = L.map(el, { zoomControl: true, attributionControl: true });
+  + const map = L.map(el, { zoomControl: true, attributionControl: true } as L.MapOptions);
+  ```
+  Run `npx tsc --noEmit` after editing.
 
-- [ ] Multiple `any` types → replace with explicit types and run `npm run lint`
-
-## src/routes/$types.d.ts
-
-- [ ] `any` types for route params → specify concrete types and run `npm run lint`
-
-## src/routes/event/[id]/$types.d.ts
-
-- [ ] `any` types for event routes → specify concrete types and run `npm run lint`
-
-## src/sveltekit.d.ts
-
-- [ ] `any` types in route typing → replace with explicit types and rerun `npm run lint`
-
-## tests/node.d.ts
-
-- [ ] `any` types for Node globals → define Node types or use `unknown`, then run `npm run lint`
-
-## tests/playwright.d.ts
-
-- [ ] `any` types for test helpers → replace with Playwright types and run `npm run lint`
-
-## src/server/routes/admin/feature-flags.ts
-
-- [ ] Parameter `c` implicitly has `any` type → type context: `import { Context } from 'hono'`
+## src/server/middleware/rate-limit.ts
+- [ ] `c.raw` missing on context → use `c.req.raw` or type context:
+  ```diff
+  - c.raw.headers.get("cf-connecting-ip");
+  + c.req.raw.headers.get("cf-connecting-ip");
+  ```
+  Run `npx tsc --noEmit`.
 
 ## src/server/routes/admin/submissions.ts
-
-- [ ] Handler parameters `c` implicitly `any` → add `Context` type
-- [ ] Invalid `await` operand and `string | undefined` passed where string expected → ensure API returns promises and handle undefined
-
-## src/server/routes/events.ts
-
-- [ ] Parameter `c` implicitly `any`; unknown[] passed to query → type parameters and validate array elements
+- [ ] Invalid `await` and undefined arguments → ensure `getSubmissions()` returns a promise and guard optional values:
+  ```diff
+  - const res = await getSubmissions(c.req.raw);
+  - await ctx.insert(res.reason);
+  + const res = await getSubmissions(c.req.raw);
+  + if (res?.reason) await ctx.insert(res.reason);
+  ```
+  Then `npx tsc --noEmit`.
 
 ## src/server/routes/ingest.ts
-
-- [ ] Parameter `c` implicitly `any`; query call typed `never`; `IngestItem` missing `description` → define proper interfaces and ensure query args types
+- [ ] Transaction callback and query args type mismatch → define proper return type and parameter array:
+  ```diff
+  - const [row] = await sql.begin(async (tx) => {
+  + const [row] = await sql.begin<{ id: string; inserted: boolean }>(async (tx) => {
+      /* ... */
+    });
+  ```
+  Run `npx tsc --noEmit`.
 
 ## src/server/routes/submit.ts
-
-- [ ] Parameter `c` implicitly `any`; object with unknown properties not assignable to `JSONValue` → validate and cast request body fields
-
-## src/workers/crawl.ts
-
-- [ ] Generic `Job` type mismatch and `job` implicitly `any` → import `Job` from bullmq
-
-## src/workers/media.ts
-
-- [ ] Generic `Job` type mismatch and `job` implicitly `any` → import `Job` from bullmq
-
-## src/workers/render.ts
-
-- [ ] Generic `Job` type mismatch and `job` implicitly `any` → import `Job` from bullmq
+- [ ] `Record<string, unknown>` not assignable to `JSONValue` → validate and stringify request body:
+  ```diff
+  - await job.add(payload as Record<string, unknown>);
+  + await job.add(JSON.parse(JSON.stringify(payload)) as JSONValue);
+  ```
+  Then `npx tsc --noEmit`.
 
 ## tests/admin/submissions.test.ts
+- [ ] `mock.module` is `unknown` → cast module type:
+  ```diff
+  - mock.module
+  + (mock.module as { default: unknown })
+  ```
+  Run `npx tsc --noEmit`.
 
-- [ ] Argument of type `unknown` not assignable to `BodyInit` → cast to `string` or `Record<string, unknown>`
-
-## tests/playwright/events.spec.ts
-
-- [ ] `page` parameter implicitly `any` → type with `Page` from `@playwright/test`
-
-## tests/playwright/submit.spec.ts
-
-- [ ] `page` binding, `route` param, and `res` param implicitly `any` → type with Playwright's `Page`, `Route`, and `APIResponse`
+## tests/schemathesis.test.ts
+- [ ] `stdio` option not allowed in spawn options → remove property or cast:
+  ```diff
+  - spawn('schemathesis', ['run'], { stdio: 'inherit' });
+  + spawn('schemathesis', ['run']);
+  ```
+  Run `npx tsc --noEmit`.
