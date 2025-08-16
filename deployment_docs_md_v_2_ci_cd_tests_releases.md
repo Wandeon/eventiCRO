@@ -57,8 +57,8 @@ Populate from **Track‑A Outputs** (see `infra-vps-runbook.md`). Store these in
 }
 ```
 
-- `build:sw` assumes you wired **Workbox **`` in `frontend-ui-pwa.md`.
-- `test:integration` points to the served artifact from `` at `/openapi.json`. If the API lives under `/api`, use `$API_BASE_URL/openapi.json` (e.g., `https://api.example.com/openapi.json`).
+ - `build:sw` assumes you wired [Workbox](frontend_ui_pwa.md#7-pwa--offline-workbox-v7) in `frontend_ui_pwa.md`.
+ - `test:integration` points to the served artifact from `api/openapi.ts` at `/openapi.json`. If the API lives under `/api`, use `$API_BASE_URL/openapi.json` (e.g., `https://api.example.com/openapi.json`).
 
 ---
 
