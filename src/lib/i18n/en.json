@@ -38,5 +38,12 @@
   "about": {
     "title": "About",
     "privacy": "Privacy"
+  },
+  "footer": {
+    "about": "About",
+    "privacy": "Privacy",
+    "repo": "GitHub",
+    "map_data": "Map data © {osm} contributors",
+    "copyright": "© EventiCRO"
   }
 }

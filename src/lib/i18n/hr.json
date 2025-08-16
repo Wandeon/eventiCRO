@@ -38,5 +38,12 @@
   "about": {
     "title": "O projektu",
     "privacy": "Privatnost"
+  },
+  "footer": {
+    "about": "O projektu",
+    "privacy": "Privatnost",
+    "repo": "GitHub",
+    "map_data": "Podaci karte © {osm} suradnici",
+    "copyright": "© EventiCRO"
   }
 }
