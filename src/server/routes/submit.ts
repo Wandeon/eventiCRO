@@ -3,6 +3,46 @@ import { HTTPException } from 'hono/http-exception'
 import db from '../db/client'
 import { submitRateLimit } from '../middleware/rate-limit'
 
+interface SubmitRequest {
+  title: string
+  description?: string
+  start_time: string
+  end_time?: string
+  venue_name?: string
+  address?: string
+  city?: string
+  lat?: number
+  lng?: number
+  organizer_name?: string
+  url?: string
+  image_url?: string
+  price?: string
+  captcha_token: string
+  honeypot?: string
+}
+
+interface SubmitErrors {
+  title?: string
+  description?: string
+  start_time?: string
+  end_time?: string
+  venue_name?: string
+  address?: string
+  city?: string
+  lat?: string
+  lng?: string
+  organizer_name?: string
+  url?: string
+  image_url?: string
+  price?: string
+  captcha_token?: string
+  honeypot?: string
+}
+
+interface FriendlyCaptchaResponse {
+  success: boolean
+}
+
 // Helper to validate URLs
 function validateUrl(value: unknown): boolean {
   if (typeof value !== 'string' || value.length === 0) return false
@@ -21,14 +61,15 @@ const route = new Hono()
 route.post('/submit', ...submitRateLimit, async (c) => {
   c.header('Cache-Control', 'no-store')
 
-  let body: any
+  let parsed: unknown
   try {
-    body = await c.req.json()
+    parsed = await c.req.json()
   } catch {
     return c.json({ error: 'Invalid JSON' }, 400)
   }
+  const body: SubmitRequest = parsed as SubmitRequest
 
-  const errors: Record<string, string> = {}
+  const errors: SubmitErrors = {}
 
   const {
     title,
@@ -46,7 +87,7 @@ route.post('/submit', ...submitRateLimit, async (c) => {
     price,
     captcha_token,
     honeypot,
-  } = body || {}
+  } = body
 
   // Title validation
   if (typeof title !== 'string' || title.trim().length < 3 || title.trim().length > 140) {
@@ -150,12 +191,12 @@ route.post('/submit', ...submitRateLimit, async (c) => {
     if (!resp.ok) {
       return c.json({ error: 'captcha verification failed' }, 503)
     }
-    const result: any = await resp.json()
+    const result: FriendlyCaptchaResponse = await resp.json()
     if (!result.success) {
       return c.json({ error: 'captcha failed' }, 403)
     }
-  } catch (err: any) {
-    if (err?.name === 'AbortError') {
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === 'AbortError') {
       return c.json({ error: 'captcha timeout' }, 503)
     }
     return c.json({ error: 'captcha verification failed' }, 503)
