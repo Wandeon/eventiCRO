@@ -33,8 +33,8 @@ Then open the provided local URL in your browser to view the app.
 
 ## Further Documentation
 
-- [Deployment guide](deployment_docs_md_v_2_ci_cd_tests_releases.md) – CI/CD,
+- [Deployment guide](deployment-docs.md) – CI/CD,
   testing, and release process.
-- [Frontend PWA specification](frontend_ui_pwa.md) – UI and progressive web app
+- [Frontend PWA specification](frontend-ui-pwa.md) – UI and progressive web app
   details.
 

@@ -3,10 +3,10 @@
 > **Scope:** Canonical guidance for building the EventiCRO web app UI (SvelteKit), PWA features (Workbox), i18n (HR/EN), Sentry instrumentation, and map integration hooks. This version aligns with:
 >
 > - [core data model API (v2)](core_data_model_api.md) — schemas, pagination, search, admin endpoints
-> - [security headers & CSP (v1)](security_headers_csp.md) — CSP/HSTS; SW/CSP compatibility
-> - [deployment docs (v2)](deployment_docs_md_v_2_ci_cd_tests_releases.md) — CI scripts, `/api/health` (no `/health` page)
-> - [map integration (v2)](map_integration.md) — Leaflet + TileServer GL + Nominatim
-> - [project baseline index (v2.1)](project_baseline_index.md) — Track‑B tasks & dependencies
+> - [security headers & CSP (v1)](security-headers-csp.md) — CSP/HSTS; SW/CSP compatibility
+> - [deployment docs (v2)](deployment-docs.md) — CI scripts, `/api/health` (no `/health` page)
+> - [map integration (v2)](map-integration.md) — Leaflet + TileServer GL + Nominatim
+> - [project baseline index (v2.1)](project-baseline-index.md) — Track‑B tasks & dependencies
 
 ---
 
@@ -52,7 +52,7 @@ Navigation: sticky header (logo, search, language HR/EN, submit), responsive dra
 ## 4) Event detail
 
 - Hero image, primary metadata, share buttons.
-- Map section: if `lat/lng` known, render Leaflet map; else show address + “Open in Maps”. Follow [map integration](map_integration.md) for geocoding fallback and 1 rps cap.
+- Map section: if `lat/lng` known, render Leaflet map; else show address + “Open in Maps”. Follow [map integration](map-integration.md) for geocoding fallback and 1 rps cap.
 - SEO: include schema.org/Event JSON‑LD (name, startDate, endDate, location).
 
 ---
@@ -101,7 +101,7 @@ Navigation: sticky header (logo, search, language HR/EN, submit), responsive dra
 
 ## 7) PWA & offline (Workbox v7)
 
-**Goal:** Cache static assets (immutable) and make `/events` queries resilient (SWR + background refresh). Respect CSP in [security headers & CSP](security_headers_csp.md) (allows `worker-src blob:`).
+**Goal:** Cache static assets (immutable) and make `/events` queries resilient (SWR + background refresh). Respect CSP in [security headers & CSP](security-headers-csp.md) (allows `worker-src blob:`).
 
 ### 7.1 Files to add
 
@@ -211,7 +211,7 @@ export const handleError = ({ error }) => { Sentry.captureException(error); retu
 
 ## 9) Map integration hooks
 
-Follow [map integration](map_integration.md) strictly. Provide a small adapter in `src/lib/map.ts` that consumes `TILESERVER_URL` from env and renders a pin when `lat/lng` exist. UI fallback with address link when not. Respect 1 rps Nominatim limit and Redis‑backed server geocoding when needed.
+Follow [map integration](map-integration.md) strictly. Provide a small adapter in `src/lib/map.ts` that consumes `TILESERVER_URL` from env and renders a pin when `lat/lng` exist. UI fallback with address link when not. Respect 1 rps Nominatim limit and Redis‑backed server geocoding when needed.
 
 ---
 
@@ -243,7 +243,7 @@ Ensure `package.json` contains:
 }
 ```
 
-And that the Caddy CSP ([security headers & CSP](security_headers_csp.md)) includes `worker-src blob:` and `connect-src` that allow `${API_BASE_URL}`, `${SENTRY_DSN_ORIGIN}`, `${TILESERVER_URL}`.
+And that the Caddy CSP ([security headers & CSP](security-headers-csp.md)) includes `worker-src blob:` and `connect-src` that allow `${API_BASE_URL}`, `${SENTRY_DSN_ORIGIN}`, `${TILESERVER_URL}`.
 
 ---
 
