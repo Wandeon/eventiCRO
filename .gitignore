@@ -1,0 +1,45 @@
+# Node
+node_modules/
+.pnpm-store/
+dist/
+.build/
+.cache/
+coverage/
+.vite/
+.svelte-kit/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# SvelteKit / PWA artifacts
+.build/
+.svelte-kit/
+.vite/
+*.map
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.envrc
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Generated docs/artifacts
+*.pptx
+*.pdf
+# Large map/tile data — keep out of git
+tiles/
+mbtiles/
+*.mbtiles

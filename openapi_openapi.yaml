@@ -1,0 +1,690 @@
+openapi: 3.0.3
+info:
+  title: EventiCRO API
+  version: 1.1.0
+  description: |
+    Public and admin API for EventiCRO. This contract is the **source of truth** used by tests
+    (Schemathesis) and by the UI. It encodes stable cursor pagination, radius filtering,
+    rate-limit semantics, and the moderation/admin surface. All public endpoints are available over
+    **HTTPS**; private service-to-service calls occur over the tailnet.
+    v1.1.0: added /api/geocode and /api/reverse (server-mediated Nominatim).
+
+servers:
+  - url: https://api.example.com
+    description: Production API (Caddy TLS)
+  - url: http://localhost:8787
+    description: Local dev
+
+security: []  # endpoints declare their own auth
+
+tags:
+  - name: Public
+    description: Public, rate-limited endpoints used by the PWA.
+  - name: Ingestion
+    description: Authenticated ingestion from n8n and other trusted jobs.
+  - name: Admin
+    description: Service-role/admin endpoints for moderation and feature flags.
+  - name: Health
+    description: Health/version info for monitoring.
+
+paths:
+  /api/health:
+    get:
+      tags: [Health]
+      summary: Service health and version
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: One or more dependencies failed quick checks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /events:
+    get:
+      tags: [Public]
+      summary: List events (cursor-paginated)
+      description: |
+        Returns upcoming events ordered by `(start_time ASC, id ASC)` with **stable cursor pagination**.
+        Text search (`q`) matches on title and description (FTS), optionally filtered by
+        geographic radius (`lat`,`lng`,`radius_km`).
+      operationId: listEvents
+      parameters:
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/startTimeFrom'
+        - $ref: '#/components/parameters/startTimeTo'
+        - $ref: '#/components/parameters/city'
+        - $ref: '#/components/parameters/category'
+        - $ref: '#/components/parameters/lat'
+        - $ref: '#/components/parameters/lng'
+        - $ref: '#/components/parameters/radius_km'
+      responses:
+        '200':
+          description: A page of events with a cursor for the next page (if any)
+          headers:
+            X-RateLimit-Limit:
+              description: Hourly quota for this endpoint
+              schema: { type: integer, example: 120 }
+            X-RateLimit-Remaining:
+              description: Remaining requests in the current window
+              schema: { type: integer, example: 117 }
+            X-RateLimit-Reset:
+              description: Seconds until the current window resets
+              schema: { type: integer, example: 1283 }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventListResponse'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              description: Seconds until a new request is permitted
+              schema: { type: integer, example: 60 }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /events/{id}:
+    get:
+      tags: [Public]
+      summary: Get a single event
+      operationId: getEvent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Event found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Event' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /ingest:
+    post:
+      tags: [Ingestion]
+      summary: Batch ingest ProcessedEvents (trusted jobs)
+      operationId: ingest
+      security:
+        - ingestSecret: []   # X-Ingest-Secret header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              minItems: 1
+              items: { $ref: '#/components/schemas/ProcessedEvent' }
+      responses:
+        '200':
+          description: Per-item ingest result
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/IngestResult' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/submit:
+    post:
+      tags: [Public]
+      summary: Public submission (moderation queue)
+      operationId: submit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SubmissionRequest' }
+      responses:
+        '202':
+          description: Accepted and queued for moderation
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ submission_id ]
+                properties:
+                  submission_id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '401':
+          description: Captcha failure or not verified
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              description: Seconds until a new request is permitted
+              schema: { type: integer, example: 60 }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/geocode:
+    get:
+      tags: [Public]
+      summary: Server-mediated geocoding (Nominatim proxy)
+      operationId: geocode
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 3 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 10, default: 5 }
+      responses:
+        '200':
+          description: Success
+          headers:
+            X-RateLimit-Limit:
+              description: Requests allowed in the current window
+              schema: { type: integer }
+            X-RateLimit-Remaining:
+              description: Requests remaining in the current window
+              schema: { type: integer }
+            X-RateLimit-Reset:
+              description: Seconds until the window resets
+              schema: { type: integer }
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GeocodeResult' }
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              description: Seconds until a new request is permitted
+              schema: { type: integer }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/reverse:
+    get:
+      tags: [Public]
+      summary: Server-mediated reverse geocoding (Nominatim proxy)
+      operationId: reverseGeocode
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema: { type: number, format: double }
+        - name: lon
+          in: query
+          required: true
+          schema: { type: number, format: double }
+      responses:
+        '200':
+          description: Success
+          headers:
+            X-RateLimit-Limit:
+              description: Requests allowed in the current window
+              schema: { type: integer }
+            X-RateLimit-Remaining:
+              description: Requests remaining in the current window
+              schema: { type: integer }
+            X-RateLimit-Reset:
+              description: Seconds until the window resets
+              schema: { type: integer }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReverseResult' }
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              description: Seconds until a new request is permitted
+              schema: { type: integer }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/admin/submissions:
+    get:
+      tags: [Admin]
+      summary: List submissions for moderation
+      operationId: listSubmissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+            default: pending
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/limit'
+      responses:
+        '200':
+          description: Page of submissions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ items, next_cursor ]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Submission' }
+                  next_cursor:
+                    type: string
+                    nullable: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/admin/submissions/{id}/approve:
+    post:
+      tags: [Admin]
+      summary: Approve a submission and promote to normalized tables
+      operationId: approveSubmission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Approved with promoted event id
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ promoted_event_id ]
+                properties:
+                  promoted_event_id:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/admin/submissions/{id}/reject:
+    post:
+      tags: [Admin]
+      summary: Reject a submission
+      operationId: rejectSubmission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 500 }
+      responses:
+        '204': { description: Rejected }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/flags:
+    get:
+      tags: [Public]
+      summary: Read feature flags (public read-only)
+      operationId: listFlags
+      responses:
+        '200':
+          description: Current flags
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FeatureFlag' }
+
+  /api/admin/feature-flags:
+    get:
+      tags: [Admin]
+      summary: List feature flags (admin)
+      operationId: listFeatureFlags
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Flags
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FeatureFlag' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/admin/feature-flags/{key}:
+    put:
+      tags: [Admin]
+      operationId: upsertFeatureFlag
+      summary: Upsert a feature flag (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: key
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled: { type: boolean }
+                description: { type: string }
+              required: [ enabled ]
+      responses:
+        '200':
+          description: Upserted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeatureFlag' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    delete:
+      operationId: deleteFeatureFlag
+      summary: Delete a feature flag (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: key
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: Deleted }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ingestSecret:
+      type: apiKey
+      in: header
+      name: X-Ingest-Secret
+
+  parameters:
+    q:
+      name: q
+      in: query
+      description: Free-text query (FTS on title/description)
+      schema:
+        type: string
+        minLength: 1
+    cursor:
+      name: cursor
+      in: query
+      description: Opaque cursor for stable pagination
+      schema:
+        type: string
+        nullable: true
+    limit:
+      name: limit
+      in: query
+      description: Page size (max 50)
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
+    startTimeFrom:
+      name: start_time_from
+      in: query
+      description: Include events starting at or after this ISO timestamp
+      schema:
+        type: string
+        format: date-time
+    startTimeTo:
+      name: start_time_to
+      in: query
+      description: Include events starting at or before this ISO timestamp
+      schema:
+        type: string
+        format: date-time
+    city:
+      name: city
+      in: query
+      description: Case-insensitive filter by city name
+      schema:
+        type: string
+    category:
+      name: category
+      in: query
+      description: Filter by category slug or id
+      schema:
+        type: string
+    lat:
+      name: lat
+      in: query
+      description: Latitude used with `lng` and `radius_km`
+      schema:
+        type: number
+        format: double
+        minimum: -90
+        maximum: 90
+    lng:
+      name: lng
+      in: query
+      description: Longitude used with `lat` and `radius_km`
+      schema:
+        type: number
+        format: double
+        minimum: -180
+        maximum: 180
+    radius_km:
+      name: radius_km
+      in: query
+      description: Search radius in kilometers (Haversine)
+      schema:
+        type: number
+        format: double
+        minimum: 1
+        maximum: 250
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, version, git_sha]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+          example: ok
+        version:
+          type: string
+          example: 1.0.0
+        git_sha:
+          type: string
+          example: 1a2b3c4d
+
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          example: BadRequest
+        message:
+          type: string
+          example: Invalid parameters
+        code:
+          type: integer
+          example: 400
+        details:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    Event:
+      type: object
+      required: [id, title, start_time]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        start_time: { type: string, format: date-time }
+        end_time: { type: string, format: date-time, nullable: true }
+        city: { type: string, nullable: true }
+        venue_id: { type: string, nullable: true }
+        organizer_id: { type: string, nullable: true }
+        url: { type: string, format: uri, nullable: true }
+        image_url: { type: string, format: uri, nullable: true }
+        price: { type: string, nullable: true }
+        verified: { type: boolean, default: false }
+
+    EventListResponse:
+      type: object
+      required: [items, next_cursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/Event' }
+        next_cursor:
+          type: string
+          nullable: true
+
+    ProcessedEvent:
+      type: object
+      required: [title, start_time]
+      properties:
+        source: { type: string, nullable: true }
+        source_id: { type: string, nullable: true }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        start_time: { type: string, format: date-time }
+        end_time: { type: string, format: date-time, nullable: true }
+        venue_name: { type: string, nullable: true }
+        address: { type: string, nullable: true }
+        city: { type: string, nullable: true }
+        lat: { type: number, format: double, nullable: true }
+        lng: { type: number, format: double, nullable: true }
+        organizer_name: { type: string, nullable: true }
+        url: { type: string, format: uri, nullable: true }
+        image_url: { type: string, format: uri, nullable: true }
+        price: { type: string, nullable: true }
+        category: { type: string, nullable: true }
+
+    IngestResult:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [inserted, updated, skipped, failed]
+        id:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+
+    SubmissionRequest:
+      type: object
+      required: [title, start_time, captcha_token]
+      properties:
+        title: { type: string }
+        description: { type: string, nullable: true, maxLength: 2000 }
+        start_time: { type: string, format: date-time }
+        end_time: { type: string, format: date-time, nullable: true }
+        venue_name: { type: string, nullable: true }
+        address: { type: string, nullable: true }
+        city: { type: string, nullable: true }
+        lat: { type: number, format: double, nullable: true }
+        lng: { type: number, format: double, nullable: true }
+        organizer_name: { type: string, nullable: true }
+        url: { type: string, format: uri, nullable: true }
+        image_url: { type: string, format: uri, nullable: true }
+        price: { type: string, nullable: true }
+        captcha_token: { type: string }
+        honeypot: { type: string, nullable: true }
+
+    Submission:
+      type: object
+      required: [id, status, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        created_at: { type: string, format: date-time }
+        payload:
+          type: object
+          additionalProperties: true
+
+    FeatureFlag:
+      type: object
+      required: [key, enabled]
+      properties:
+        key: { type: string }
+        enabled: { type: boolean }
+        description: { type: string, nullable: true }
+
+    GeocodeResult:
+      type: object
+      properties:
+        display_name: { type: string }
+        lat: { type: number, format: double }
+        lon: { type: number, format: double }
+        boundingbox:
+          type: array
+          minItems: 4
+          maxItems: 4
+          items: { type: number }
+
+    ReverseResult:
+      type: object
+      properties:
+        display_name: { type: string }
+        address:
+          type: object
+          additionalProperties: true
