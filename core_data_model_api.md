@@ -16,7 +16,7 @@
 
 - **Timezone:** store all timestamps in **UTC**; convert on read for UI.
 - **IDs:** short, sortable ULIDs or `uuid` (Postgres `uuid` type). Examples below use `uuid`.
-- **Text search locale:** PostgreSQL ``** + **`` config (Croatian dictionary is not built-in). Optional trigram for fuzzy.
+- **Text search locale:** PostgreSQL `simple` + `unaccent` config (Croatian dictionary is not built-in). Optional trigram for fuzzy.
 - **Sentry:** replace any `GLITCHTIP_*` with ``.
 
 ---
