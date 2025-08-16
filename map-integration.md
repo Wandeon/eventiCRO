@@ -4,7 +4,7 @@
 >
 > - `frontend-ui-pwa.md (v2)` — UI hooks & env
 > - `security-headers-csp.md (v1)` — CSP allowlists (`img-src`, `connect-src`)
-> - `core-data-model-api.md (v2)` — radius filter contract
+> - `core_data_model_api.md (v2)` — radius filter contract
 > - `infra-vps-runbook.md (v1)` — TileServer GL & Nominatim services
 > - `tailscale-networking.md (v1)` — private bindings
 
@@ -127,7 +127,7 @@ export function boundsToRadiusKm(bounds: L.LatLngBounds) {
 
 UI: when map idle, compute `lat`, `lng`, `radius_km` from bounds and call `/events?lat=…&lng=…&radius_km=…` with the other filters.
 
-> This matches the Haversine filter in `core-data-model-api.md (v2)`.
+> This matches the Haversine filter in `core_data_model_api.md (v2)`.
 
 ---
 

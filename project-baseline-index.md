@@ -102,7 +102,7 @@
 
 ### B1. Data Model & API
 
-- Use `core-data-model-api.md` for schema and OpenAPI (now first-class under `/openapi/openapi.yaml`).
+- Use `core_data_model_api.md` for schema and OpenAPI (now first-class under `/openapi/openapi.yaml`).
 - Cursor pagination, radius search, quotas; admin endpoints for moderation and feature flags.
 
 ### B2. Frontend UI & PWA
@@ -137,7 +137,7 @@
 7. **`api/openapi.ts`** — *New*. Static JSON serving of compiled OpenAPI.
 8. **`project-baseline-index.md`**\*\* (this file)\*\* ▲ — Introduces Dual‑Track plan, multi-host topology, and authoritative order of work.
 9. **`deployment-docs.md`** ▲ — Switched telemetry to **Sentry self‑hosted**; adds `/api/health` contract, CI quality gates, and service discovery table.
-10. **`core-data-model-api.md`** ▲ — Adds cursor pagination, radius filters, admin endpoints, stable ordering, FTS guidance, and renames `GLITCHTIP_DSN` → `SENTRY_DSN`.
+10. **`core_data_model_api.md`** ▲ — Adds cursor pagination, radius filters, admin endpoints, stable ordering, FTS guidance, and renames `GLITCHTIP_DSN` → `SENTRY_DSN`.
 11. **`frontend-ui-pwa.md`** ▲ — Adds explicit Workbox `injectManifest` wiring, i18n seed bundle references (HR/EN), and removes the `/health` page in favor of `/api/health`.
 12. **`map-integration.md`** ▲ — Keeps self-hosted TileServer GL + Nominatim; clarifies rate limiting and fallback; notes optional MapLibre GL vector path for later.
 13. **`user-submission-flow.md`** ▲ — Clarifies moderation endpoints and admin review flow.
