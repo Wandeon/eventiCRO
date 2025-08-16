@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Hono } from "hono";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";

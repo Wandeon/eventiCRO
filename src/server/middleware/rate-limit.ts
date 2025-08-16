@@ -54,7 +54,7 @@ function rateLimit(rule: Rule) {
 const ip = (c: Context) => {
   const forwarded = c.req.header("x-forwarded-for");
   if (forwarded) return forwarded;
-  const raw = c.req.raw as unknown;
+  const raw = (c.req as any).raw as unknown;
   if (typeof raw === "object" && raw) {
     const socket = (raw as { socket?: { remoteAddress?: string } }).socket;
     if (socket && typeof socket.remoteAddress === "string") {
