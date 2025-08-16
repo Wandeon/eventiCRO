@@ -7,7 +7,7 @@
 > - `project-baseline-index.md` → PR‑1, PR‑2, PR‑9
 > - `openapi/openapi.yaml` & `api/openapi.ts`
 > - `security-headers-csp.md`
-> - [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md), `backups-runbook.md`, `tailscale-networking.md`, `infra-vps-runbook.md`
+> - [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md), `backups-runbook.md`, `tailscale-networking.md`, `infra-vps-runbook.md`, `track-a-outputs.md`
 
 ---
 
@@ -25,7 +25,7 @@
 
 ## 1) Required secrets (per environment)
 
-Populate from **Track‑A Outputs** (see `infra-vps-runbook.md`). Store these in your CI secrets manager and on the servers.
+Populate from [track-a-outputs.md](track-a-outputs.md). Store these in your CI secrets manager and on the servers.
 
 - **App:** `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, `REDIS_URL`, `MINIO_URL`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `SENTRY_DSN`, `OTEL_EXPORTER_OTLP_ENDPOINT`, `INGEST_SECRET`.
 - **Sentry release (optional):** `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_URL` (self‑hosted origin).
@@ -226,17 +226,9 @@ jobs:
 
 ---
 
-## 9) Service discovery table (copy from Track‑A outputs)
+## 9) Service discovery
 
-| Key                            | Example                                                                     |
-| ------------------------------ | --------------------------------------------------------------------------- |
-| APP\_BASE\_URL                 | `https://app.example.com`                                                   |
-| API\_BASE\_URL                 | `https://api.example.com`                                                   |
-| OTEL\_EXPORTER\_OTLP\_ENDPOINT | `http://vps-01.tailnet.local:4317`                                          |
-| SENTRY\_DSN                    | `https://<public>@sentry.example.com/<project>`                             |
-| TILESERVER\_URL                | `https://tiles.example.com`                                                 |
-| NOMINATIM\_URL                 | `https://geo.example.com` (if browser‑exposed; usually tailnet‑only)        |
-| MINIO\_URL                     | `http://vps-01.tailnet.local:9000` (tailnet) or `https://minio.example.com` |
+See [track-a-outputs.md](track-a-outputs.md) for the authoritative list of runtime URLs and endpoints.
 
 ---
 

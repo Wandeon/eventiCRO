@@ -194,28 +194,7 @@
 
 ## E. Required Outputs from Track A (to unblock Track B)
 
-Populate this table in `infra-vps-runbook.md` before starting Track B:
-
-| Key                              | Value (example)                                        |
-| -------------------------------- | ------------------------------------------------------ |
-| APP\_BASE\_URL                   | `https://app.example.com`                              |
-| API\_BASE\_URL                   | `https://api.example.com`                              |
-| SUPABASE\_URL                    | `http://10.0.0.10:54321` or managed URL                |
-| SUPABASE\_ANON\_KEY              | `***`                                                  |
-| SUPABASE\_SERVICE\_KEY           | `***`                                                  |
-| REDIS\_URL                       | `redis://10.0.0.20:6379`                               |
-| MINIO\_URL                       | `https://minio.example.com`                            |
-| MINIO\_ACCESS\_KEY / SECRET\_KEY | `***` / `***`                                          |
-| TILESERVER\_URL                  | `https://tiles.example.com`                            |
-| NOMINATIM\_URL                   | `https://geo.example.com`                              |
-| SENTRY\_DSN                      | `https://<public>@sentry.example.com/<project>`        |
-| OTEL\_EXPORTER\_OTLP\_ENDPOINT   | `http://otel-collector:4317`                           |
-| INGEST\_SECRET                   | `***`                                                  |
-| GPU\_TAILNET\_HOST               | `gpu-01.tailnet.local` or `100.x.x.x`                  |
-| MEDIA\_SERVICE\_URL              | `http://gpu-01.tailnet.local:8088` (ffmpeg/yt-dlp API) |
-| BROWSERLESS\_WS\_URL             | `ws://gpu-01.tailnet.local:3000`                       |
-| CRAWL4AI\_URL                    | `http://gpu-01.tailnet.local:8089`                     |
-| QDRANT\_URL (optional)           | `http://vps-01.tailnet.local:6333`                     |
+Record all required URLs, secrets, and endpoints in [track-a-outputs.md](track-a-outputs.md) before starting Track B.
 
 ---
 

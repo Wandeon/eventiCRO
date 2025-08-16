@@ -14,7 +14,7 @@
 
 - **Framework:** SvelteKit v2 + TypeScript. Styling: TailwindCSS (stable), Headless UI patterns.
 - **Libraries:** Zod (validation), typesafe‑i18n (HR/EN), Leaflet (map), `@sentry/sveltekit` (self‑hosted Sentry), Workbox v7 (SW).
-- **Env (read at build/runtime):** `APP_BASE_URL`, `API_BASE_URL`, `SENTRY_DSN`, `TILESERVER_URL`. Public endpoints are **HTTPS** via Caddy; internal calls use **tailnet**.
+- **Env (read at build/runtime):** `APP_BASE_URL`, `API_BASE_URL`, `SENTRY_DSN`, `TILESERVER_URL`. Public endpoints are **HTTPS** via Caddy; internal calls use **tailnet**. Populate these from [track-a-outputs.md](track-a-outputs.md).
 
 ---
 

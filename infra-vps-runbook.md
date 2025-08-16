@@ -334,23 +334,7 @@ Implement `backups-runbook.md`:
 
 ## N) Outputs (fill all before Track‑B)
 
-| Key                              | Value                                                             |
-| -------------------------------- | ----------------------------------------------------------------- |
-| APP\_BASE\_URL                   | `https://app.example.com`                                         |
-| API\_BASE\_URL                   | `https://api.example.com`                                         |
-| VPS\_PUBLIC\_IP                  | `x.x.x.x`                                                         |
-| VPS\_TAILNET\_NAME               | `vps-01.tailnet.local`                                            |
-| GPU\_TAILNET\_NAME               | `gpu-01.tailnet.local`                                            |
-| REDIS\_URL                       | `redis://vps-01.tailnet.local:6379`                               |
-| MINIO\_URL                       | `http://vps-01.tailnet.local:9000` or `https://minio.example.com` |
-| MINIO\_ACCESS\_KEY / SECRET\_KEY | `*** / ***`                                                       |
-| TILESERVER\_URL                  | `https://tiles.example.com`                                       |
-| NOMINATIM\_URL                   | `http://vps-01.tailnet.local:8070` (tailnet)                      |
-| SENTRY\_DSN                      | `https://<public>@sentry.example.com/<project>`                   |
-| OTEL\_EXPORTER\_OTLP\_ENDPOINT   | `http://vps-01.tailnet.local:4317`                                |
-| N8N\_WEB\_URL                    | `https://api.example.com` (webhooks base)                         |
-| INGEST\_SECRET                   | `***`                                                             |
-| POSTGRES\_URL                    | `postgres://user:pass@host:5432/db`                               |
+Record all runtime values in [track-a-outputs.md](track-a-outputs.md) once infrastructure is provisioned.
 
 ---
 

@@ -7,6 +7,7 @@
 > - `core_data_model_api.md (v2)` — radius filter contract
 > - `infra-vps-runbook.md (v1)` — TileServer GL & Nominatim services
 > - `tailscale-networking.md (v1)` — private bindings
+> - `track-a-outputs.md` — runtime URLs and secrets
 
 ---
 
@@ -19,12 +20,14 @@
 
 ---
 
-## 1) Runtime env (Track‑A outputs)
+## 1) Runtime env (see track-a-outputs.md)
 
 - `TILESERVER_URL` — public HTTPS tiles host (Caddy): `https://tiles.example.com`
 - `NOMINATIM_URL` — **private** tailnet URL: `http://vps-01.tailnet.local:8070`
 - `MAP_DEFAULT_BBOX` — Croatia bounding box: `13.090,42.390,19.450,46.550`
 - `MAP_ATTRIBUTION` — `© OpenStreetMap contributors`
+
+> Use values from [track-a-outputs.md](track-a-outputs.md).
 
 > Add `TILESERVER_URL` to CSP `img-src`/`connect-src` in `security-headers-csp.md`.
 
