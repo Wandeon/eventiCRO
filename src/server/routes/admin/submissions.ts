@@ -12,6 +12,23 @@ interface SubmissionRow {
   reason: string | null;
 }
 
+interface User {
+  sub: string;
+}
+
+interface SubmissionPayload {
+  title?: string;
+  description?: string | null;
+  start_time?: string;
+  end_time?: string | null;
+  city?: string | null;
+  url?: string | null;
+  image_url?: string | null;
+  price?: unknown;
+  submitter_email?: string | null;
+  [key: string]: unknown;
+}
+
 const route = new Hono();
 
 route.use("*", requireAuth);
@@ -54,7 +71,11 @@ route.get("/", async (c) => {
 
 route.post("/:id/approve", async (c) => {
   const id = c.req.param("id");
-  const reviewer = (c.get("user") as any)?.sub ?? "admin";
+  const user = c.get("user") as unknown;
+  const reviewer =
+    typeof (user as { sub?: unknown })?.sub === "string"
+      ? (user as User).sub
+      : "admin";
 
   const submission = await db<SubmissionRow[]>`
     SELECT id, payload FROM submissions WHERE id = ${id}
@@ -62,7 +83,14 @@ route.post("/:id/approve", async (c) => {
   if (submission.length === 0) {
     return c.text("Not Found", 404);
   }
-  const payload = submission[0].payload as Record<string, any>;
+  const rawPayload = submission[0].payload as unknown;
+  if (!rawPayload || typeof rawPayload !== "object") {
+    return c.text("Invalid payload", 500);
+  }
+  const payload = rawPayload as SubmissionPayload;
+  if (typeof payload.title !== "string") {
+    return c.text("Invalid payload", 500);
+  }
 
   const eventRows = await db<{ id: string }[]>`
     INSERT INTO events (title, description, start_time, end_time, city, url, image_url, price, created_at, updated_at, source, source_id)
@@ -91,7 +119,7 @@ route.post("/:id/approve", async (c) => {
     WHERE id = ${id}
   `;
 
-  if (payload.submitter_email) {
+  if (typeof payload.submitter_email === "string") {
     console.log(
       `Submission ${id} approved; notifying ${payload.submitter_email}`,
     );
@@ -102,7 +130,11 @@ route.post("/:id/approve", async (c) => {
 
 route.post("/:id/reject", async (c) => {
   const id = c.req.param("id");
-  const reviewer = (c.get("user") as any)?.sub ?? "admin";
+  const user = c.get("user") as unknown;
+  const reviewer =
+    typeof (user as { sub?: unknown })?.sub === "string"
+      ? (user as User).sub
+      : "admin";
 
   let reason: string | undefined;
   try {
@@ -120,7 +152,11 @@ route.post("/:id/reject", async (c) => {
   if (submission.length === 0) {
     return c.text("Not Found", 404);
   }
-  const payload = submission[0].payload as Record<string, any>;
+  const rawPayload = submission[0].payload as unknown;
+  if (!rawPayload || typeof rawPayload !== "object") {
+    return c.text("Invalid payload", 500);
+  }
+  const payload = rawPayload as SubmissionPayload;
 
   await db`
     UPDATE submissions
@@ -128,7 +164,7 @@ route.post("/:id/reject", async (c) => {
     WHERE id = ${id}
   `;
 
-  if (payload.submitter_email) {
+  if (typeof payload.submitter_email === "string") {
     console.log(
       `Submission ${id} rejected; notifying ${payload.submitter_email}`,
     );
