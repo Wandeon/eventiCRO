@@ -36,6 +36,14 @@ pnpm dev
 
 Then open the provided local URL in your browser to view the app.
 
+## Testing
+
+Run integration and end-to-end tests:
+
+```sh
+pnpm test
+```
+
 ## Further Documentation
 
 - [Deployment guide](deployment-docs.md) – CI/CD,

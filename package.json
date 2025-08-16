@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "echo 'No tests specified' && exit 0",
+    "test": "pnpm run test:integration && pnpm run test:e2e",
     "test:integration": "schemathesis run --checks all --rate-limit=50 --hypothesis-max-examples=50 --base-url=$API_BASE_URL $API_BASE_URL/openapi.json",
     "test:e2e": "playwright test",
     "build:ui": "vite build",
@@ -15,6 +15,6 @@
     "hono": "^4.0.0",
     "yaml": "^2.0.0",
     "postgres": "^3.3.5",
-    "ioredis": "^5.3.2",
+    "ioredis": "^5.3.2"
   }
 }
