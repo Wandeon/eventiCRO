@@ -158,7 +158,7 @@ interface Context {
   set: (key: string, val: unknown) => void;
   json: (data: unknown, status?: number) => Response;
   text: (txt: string, status?: number) => Response;
-  body: (data: unknown, status?: number) => Response;
+  body: (data: BodyInit | null, status?: number) => Response;
 }
 
 type Handler = (c: Context) => Response | Promise<Response>;
@@ -210,7 +210,8 @@ class StubHono {
           headers: { "Content-Type": "application/json" },
         }),
       text: (txt: string, status = 200) => new Response(txt, { status }),
-      body: (data: unknown, status = 200) => new Response(data, { status }),
+      body: (data: BodyInit | null, status = 200) =>
+        new Response(data, { status }),
     };
     if (method === "GET" && this.getHandler) {
       return this.getHandler(c);

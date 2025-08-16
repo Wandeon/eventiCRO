@@ -1,49 +1,94 @@
 declare module "@sentry/sveltekit" {
-  export const init: any;
-  export const captureException: any;
+  import type { CaptureContext, Options } from "@sentry/types";
+  export function init(options: Options): void;
+  export function captureException(
+    exception: unknown,
+    captureContext?: CaptureContext,
+  ): string;
 }
+
 declare module "jsonwebtoken" {
-  const jwt: any;
-  export default jwt;
+  export function sign(
+    payload: string | object | Buffer,
+    secretOrPrivateKey: string,
+    options?: Record<string, unknown>,
+  ): string;
+  export function verify(
+    token: string,
+    secretOrPublicKey: string,
+    options?: Record<string, unknown>,
+  ): string | Record<string, unknown>;
 }
+
 declare module "leaflet" {
   namespace L {
     interface Map {
-      setView(...args: any[]): any;
+      setView(center: [number, number], zoom: number): Map;
     }
-    function map(...args: any[]): Map;
-    function tileLayer(...args: any[]): any;
-    function marker(...args: any[]): any;
+    function map(element: string | HTMLElement): Map;
+    function tileLayer(
+      urlTemplate: string,
+      options?: Record<string, unknown>,
+    ): unknown;
+    function marker(
+      latlng: [number, number],
+      options?: Record<string, unknown>,
+    ): unknown;
   }
   export = L;
 }
+
 declare module "svelte/store" {
-  export function writable<T = any>(value?: T): any;
+  export interface Writable<T> {
+    subscribe(run: (value: T) => void): () => void;
+    set(value: T): void;
+    update(updater: (value: T) => T): void;
+  }
+  export function writable<T>(value?: T): Writable<T>;
 }
+
 declare module "hono" {
   export class Hono {
-    use(...args: any[]): any;
-    get(...args: any[]): any;
-    post(...args: any[]): any;
-    route(...args: any[]): any;
-    request(...args: any[]): any;
+    use(...handlers: unknown[]): void;
+    get(path: string, ...handlers: unknown[]): void;
+    post(path: string, ...handlers: unknown[]): void;
+    route(path: string, app: Hono): void;
+    request(input: RequestInfo, init?: RequestInit): Promise<Response>;
   }
+
   export interface Context {
-    req: any;
-    json: any;
-    text: any;
-    header: any;
-    get(key: string): any;
-    set(key: string, value: any): any;
+    req: {
+      query(name: string): string | undefined;
+      param(name: string): string;
+      header(name: string): string | undefined;
+      json<T = unknown>(): Promise<T>;
+    };
+    json<T>(data: T, status?: number): Response;
+    text(data: string, status?: number): Response;
+    header(name: string, value: string): void;
+    get<T = unknown>(key: string): T;
+    set<T = unknown>(key: string, value: T): void;
   }
-  export type Next = any;
+  export type Next = () => Promise<void>;
 }
+
 declare module "bullmq" {
-  interface ConnectionOptions {
+  export interface ConnectionOptions {
     url?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   }
-  export class Worker {
-    constructor(...args: any[]);
+
+  export interface Job<Data = unknown> {
+    data: Data;
+    id?: string;
+    name: string;
+  }
+
+  export class Worker<Data = unknown> {
+    constructor(
+      name: string,
+      processor: (job: Job<Data>) => Promise<unknown>,
+      opts?: { connection?: ConnectionOptions },
+    );
   }
 }

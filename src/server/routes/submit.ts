@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import db from "../db/client";
 import { submitRateLimit } from "../middleware/rate-limit";
@@ -18,7 +19,7 @@ function validateUrl(value: unknown): boolean {
 
 const route = new Hono();
 
-route.post("/submit", ...submitRateLimit, async (c) => {
+route.post("/submit", ...submitRateLimit, async (c: Context) => {
   c.header("Cache-Control", "no-store");
 
   let body: unknown;
@@ -180,20 +181,22 @@ route.post("/submit", ...submitRateLimit, async (c) => {
     return c.json({ error: "captcha verification failed" }, 503);
   }
 
-  const payload = {
-    title,
-    description,
-    start_time,
-    end_time,
-    venue_name,
-    address,
-    city,
-    lat,
-    lng,
-    organizer_name,
-    url,
-    image_url,
-    price,
+  const payload: Record<string, unknown> = {
+    title: title as string,
+    ...(typeof description === "string" ? { description } : {}),
+    start_time: start_time as string,
+    ...(typeof end_time === "string" ? { end_time } : {}),
+    ...(typeof venue_name === "string" ? { venue_name } : {}),
+    ...(typeof address === "string" ? { address } : {}),
+    ...(typeof city === "string" ? { city } : {}),
+    ...(typeof lat === "number" ? { lat } : {}),
+    ...(typeof lng === "number" ? { lng } : {}),
+    ...(typeof organizer_name === "string" ? { organizer_name } : {}),
+    ...(typeof url === "string" ? { url } : {}),
+    ...(typeof image_url === "string" ? { image_url } : {}),
+    ...(typeof price === "string" || typeof price === "number"
+      ? { price }
+      : {}),
   };
 
   const [row] =
