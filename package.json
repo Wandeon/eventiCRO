@@ -1,0 +1,12 @@
+{
+  "name": "eventiCRO",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "echo 'No tests specified' && exit 0"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "yaml": "^2.0.0"
+  }
+}
