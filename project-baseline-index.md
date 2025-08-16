@@ -116,7 +116,7 @@
 
 ### B4. Packaging
 
-- Use `mobile-packaging.md` for TWA (Android) + Capacitor (iOS).
+- Use [mobile-packaging.md](mobile-packaging.md) for TWA (Android) + Capacitor (iOS).
 
 ### B5. Deployment & Tests
 
