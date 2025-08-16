@@ -11,14 +11,19 @@ experience.
 
 ## Installation
 
+Before getting started, make sure you have the following installed:
+
+- Node.js 20 or later
+- pnpm
+
 1. **Clone the repository**
    ```sh
    git clone https://github.com/your-org/eventiCRO.git
    cd eventiCRO
    ```
-2. **Install dependencies** (requires Node.js and npm)
+2. **Install dependencies**
    ```sh
-   npm install
+   pnpm install
    ```
 
 ## Basic Usage
@@ -26,7 +31,7 @@ experience.
 After installing dependencies, start the development server:
 
 ```sh
-npm run dev
+pnpm dev
 ```
 
 Then open the provided local URL in your browser to view the app.
