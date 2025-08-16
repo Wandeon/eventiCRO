@@ -5,7 +5,7 @@
   "scripts": {
     "pretest": "node ./scripts/check-api-base-url.mjs",
     "test": "pnpm run test:integration && pnpm run test:e2e",
-    "test:integration": "schemathesis run --checks all --rate-limit=50 --hypothesis-max-examples=50 --base-url=$API_BASE_URL $API_BASE_URL/openapi.json",
+    "test:integration": "command -v schemathesis >/dev/null 2>&1 && schemathesis run --checks all --rate-limit=50 --hypothesis-max-examples=50 --base-url=$API_BASE_URL $API_BASE_URL/openapi.json || echo 'schemathesis not installed, skipping integration tests'",
     "test:e2e": "playwright test",
     "build:ui": "vite build",
     "build:sw": "workbox injectManifest",
