@@ -36,6 +36,16 @@ pnpm dev
 
 Then open the provided local URL in your browser to view the app.
 
+## Environment Variables
+
+The app and tests read the base API endpoint from the `API_BASE_URL` environment variable. Set it to point to your API server before running commands that interact with the backend:
+
+```sh
+export API_BASE_URL=http://localhost:8787
+```
+
+If `API_BASE_URL` is not defined, test scripts will abort with an error.
+
 ## Testing
 
 Run integration and end-to-end tests:
@@ -50,4 +60,3 @@ pnpm test
   testing, and release process.
 - [Frontend PWA specification](frontend-ui-pwa.md) – UI and progressive web app
   details.
-
