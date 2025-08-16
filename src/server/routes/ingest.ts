@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { db } from "../db/client";
 
@@ -16,7 +17,7 @@ function normalizeCity(city?: string | null) {
   return trimmed.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-route.post("/", async (c) => {
+route.post("/", async (c: Context) => {
   const header =
     c.req.header("ingest_secret") || c.req.header("x-ingest-secret");
   if (!header || header !== ingestSecret) {
@@ -36,6 +37,7 @@ route.post("/", async (c) => {
 
   interface IngestItem {
     title?: unknown;
+    description?: unknown;
     start_time?: unknown;
     end_time?: unknown;
     city?: unknown;
@@ -101,7 +103,10 @@ route.post("/", async (c) => {
           ? item.source_id
           : url;
 
-      const result = await db.begin(async (tx) => {
+      const result = await db.begin<{
+        id: string;
+        inserted: boolean;
+      }>(async (tx) => {
         let venueId: string | null = null;
         if (typeof item.venue_name === "string" && item.venue_name) {
           const [venue] = await tx`

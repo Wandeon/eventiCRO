@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import db from "../../db/client";
 import requireAuth from "../../middleware/auth";
 
@@ -33,7 +34,7 @@ const route = new Hono();
 
 route.use("*", requireAuth);
 
-route.get("/", async (c) => {
+route.get("/", async (c: Context) => {
   const status = c.req.query("status") ?? "pending";
   const q = c.req.query("q") ?? "";
   const limitParam = parseInt(c.req.query("limit") || "50", 10);
@@ -69,7 +70,7 @@ route.get("/", async (c) => {
   return c.json({ items: rows, next_cursor: nextCursor });
 });
 
-route.post("/:id/approve", async (c) => {
+route.post("/:id/approve", async (c: Context) => {
   const id = c.req.param("id");
   const user = c.get("user") as unknown;
   const reviewer =
@@ -128,7 +129,7 @@ route.post("/:id/approve", async (c) => {
   return c.json({ promoted_event_id: promotedEventId });
 });
 
-route.post("/:id/reject", async (c) => {
+route.post("/:id/reject", async (c: Context) => {
   const id = c.req.param("id");
   const user = c.get("user") as unknown;
   const reviewer =

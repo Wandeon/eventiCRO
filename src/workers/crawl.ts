@@ -1,4 +1,4 @@
-import { Worker } from 'bullmq';
+import { Worker, Job } from "bullmq";
 
 export interface CrawlJob {
   /** URL to crawl */
@@ -11,19 +11,19 @@ export interface CrawlJob {
  * ingestion API defined by `API_BASE_URL` and `INGEST_SECRET`.
  */
 export function startCrawlWorker(
-  redisUrl = process.env.REDIS_URL || 'redis://localhost:6379',
+  redisUrl = process.env.REDIS_URL || "redis://localhost:6379",
 ) {
   return new Worker<CrawlJob>(
-    'crawl',
-    async (job) => {
+    "crawl",
+    async (job: Job<CrawlJob>) => {
       const crawlApi = process.env.CRAWL4AI_URL;
       if (!crawlApi) {
-        throw new Error('CRAWL4AI_URL not set');
+        throw new Error("CRAWL4AI_URL not set");
       }
 
       const crawlRes = await fetch(`${crawlApi}/crawl`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ url: job.data.url }),
       });
 
@@ -38,9 +38,9 @@ export function startCrawlWorker(
         const ingestRes = await fetch(
           `${process.env.API_BASE_URL}/api/ingest`,
           {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'content-type': 'application/json',
+              "content-type": "application/json",
               ...(process.env.INGEST_SECRET
                 ? { INGEST_SECRET: process.env.INGEST_SECRET }
                 : {}),
@@ -59,4 +59,3 @@ export function startCrawlWorker(
     { connection: { url: redisUrl } },
   );
 }
-

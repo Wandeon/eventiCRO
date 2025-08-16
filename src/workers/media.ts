@@ -1,10 +1,10 @@
-import { Worker } from 'bullmq';
+import { Worker, Job } from "bullmq";
 
 export interface MediaJob {
   /** Source URL or path of the media asset */
   source: string;
   /** Operation to perform, e.g. download, transcode, thumbnail */
-  type: 'download' | 'transcode' | 'thumbnail';
+  type: "download" | "transcode" | "thumbnail";
   /** Optional extra parameters forwarded to the media service */
   options?: Record<string, unknown>;
 }
@@ -15,19 +15,19 @@ export interface MediaJob {
  * defined by `REDIS_URL` (default `redis://localhost:6379`).
  */
 export function startMediaWorker(
-  redisUrl = process.env.REDIS_URL || 'redis://localhost:6379',
+  redisUrl = process.env.REDIS_URL || "redis://localhost:6379",
 ) {
   const worker = new Worker<MediaJob>(
-    'media',
-    async (job) => {
+    "media",
+    async (job: Job<MediaJob>) => {
       const serviceUrl = process.env.MEDIA_SERVICE_URL;
       if (!serviceUrl) {
-        throw new Error('MEDIA_SERVICE_URL not set');
+        throw new Error("MEDIA_SERVICE_URL not set");
       }
 
       const response = await fetch(serviceUrl, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify(job.data),
       });
 
@@ -44,4 +44,3 @@ export function startMediaWorker(
 
   return worker;
 }
-

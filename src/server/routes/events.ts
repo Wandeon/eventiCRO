@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import db from "../db/client";
 import { encodeCursor, decodeCursor } from "../util/cursor";
 import { eventsRateLimit } from "../middleware/rate-limit";
@@ -11,7 +12,7 @@ function parseNumber(v: string | undefined): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
-route.get("/", eventsRateLimit, async (c) => {
+route.get("/", eventsRateLimit, async (c: Context) => {
   const q = c.req.query("q");
   const cursorParam = c.req.query("cursor");
   const limitParam = parseNumber(c.req.query("limit"));
@@ -26,7 +27,7 @@ route.get("/", eventsRateLimit, async (c) => {
   const limit = Math.min(Math.max(limitParam ?? 20, 1), 50);
   const cursor = cursorParam ? decodeCursor(cursorParam) : null;
 
-  const params: unknown[] = [];
+  const params: Array<string | number> = [];
   const where: string[] = [];
   const joins: string[] = [];
 
