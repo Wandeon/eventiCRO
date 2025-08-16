@@ -9,7 +9,8 @@
     "test:e2e": "playwright test",
     "build:ui": "vite build",
     "build:sw": "workbox injectManifest",
-    "build": "pnpm run build:ui && pnpm run build:sw"
+    "build": "pnpm run build:ui && pnpm run build:sw",
+    "lint": "eslint ."
   },
   "dependencies": {
     "bullmq": "^4.0.0",
@@ -21,6 +22,9 @@
   "devDependencies": {
     "@playwright/test": "^1.44.0",
     "vite": "^5.0.0",
-    "workbox-cli": "^7.0.0"
+    "workbox-cli": "^7.0.0",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^7.17.0",
+    "@typescript-eslint/parser": "^7.17.0"
   }
 }
