@@ -1,17 +1,26 @@
-declare module "node:test" {
+declare module 'node:test' {
   export const test: any;
   export const mock: any;
   export default test;
 }
-declare module "node:assert/strict" {
+declare module 'node:assert/strict' {
   const assert: any;
   export { assert as default };
 }
-declare module "node:child_process" {
+declare module 'node:child_process' {
   export function execSync(...args: any[]): any;
 }
-declare module "node:crypto" {
+declare module 'node:crypto' {
   export function randomUUID(): string;
+}
+
+declare module 'node:http' {
+  interface IncomingMessage {
+    socket?: {
+      remoteAddress?: string;
+    };
+  }
+  export { IncomingMessage };
 }
 declare const process: any;
 declare class Buffer {
