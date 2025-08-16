@@ -1,3 +1,38 @@
 {
-  "hello": "Hello"
+  "nav": {
+    "search": "Search events",
+    "submit": "Submit event",
+    "language": "Language"
+  },
+  "home": {
+    "title": "Events in Croatia",
+    "empty": "No events found.",
+    "load_more": "Load more"
+  },
+  "filters": {
+    "title": "Filters",
+    "category": "Category",
+    "date_from": "From",
+    "date_to": "To",
+    "city": "City",
+    "radius": "Radius",
+    "verified": "Verified only"
+  },
+  "event": {
+    "free": "Free",
+    "price": "Price",
+    "when": "When",
+    "where": "Where",
+    "organizer": "Organizer",
+    "open_in_maps": "Open in Maps"
+  },
+  "submit": {
+    "title": "Submit an event",
+    "success": "Thanks! Your event was submitted for review.",
+    "error": "Submission failed."
+  },
+  "about": {
+    "title": "About",
+    "privacy": "Privacy"
+  }
 }

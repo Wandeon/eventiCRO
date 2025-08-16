@@ -1,3 +1,38 @@
 {
-  "hello": "Bok"
+  "nav": {
+    "search": "Pretraži događaje",
+    "submit": "Pošalji događaj",
+    "language": "Jezik"
+  },
+  "home": {
+    "title": "Događaji u Hrvatskoj",
+    "empty": "Nema pronađenih događaja.",
+    "load_more": "Učitaj još"
+  },
+  "filters": {
+    "title": "Filteri",
+    "category": "Kategorija",
+    "date_from": "Od",
+    "date_to": "Do",
+    "city": "Grad",
+    "radius": "Radijus",
+    "verified": "Samo provjereni"
+  },
+  "event": {
+    "free": "Besplatno",
+    "price": "Cijena",
+    "when": "Kada",
+    "where": "Gdje",
+    "organizer": "Organizator",
+    "open_in_maps": "Otvori u Kartama"
+  },
+  "submit": {
+    "title": "Pošalji događaj",
+    "success": "Hvala! Vaš događaj je poslan na pregled.",
+    "error": "Slanje nije uspjelo."
+  },
+  "about": {
+    "title": "O projektu",
+    "privacy": "Privatnost"
+  }
 }
