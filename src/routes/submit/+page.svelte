@@ -1,7 +1,9 @@
 <script lang="ts">
-// TODO: implement submit page
+  import SubmitForm from '../../lib/components/SubmitForm.svelte';
+  import { t } from '../../lib/i18n';
 </script>
 
 <main>
-  <h1>Submit</h1>
+  <h1>{$t.submit.title}</h1>
+  <SubmitForm />
 </main>
