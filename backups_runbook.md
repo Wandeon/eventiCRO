@@ -5,7 +5,7 @@
 > **References:**
 > - `project-baseline-index.md` → A5
 > - `infra-vps-runbook.md` → §§4, 9–11
-> - `observability.md` → backup success metrics/alerts
+> - [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md) → backup success metrics/alerts
 
 ---
 
@@ -173,7 +173,7 @@ mc ls local/uploads  >/dev/null
 
 **Observability hooks**
 - Emit a **heartbeat** to Uptime Kuma after successful backup and drill (HTTP GET to a private monitor URL).
-- Optional: push `backup_success{job="postgres"}=1` to a Prometheus Pushgateway (see `observability.md`).
+- Optional: push `backup_success{job="postgres"}=1` to a Prometheus Pushgateway (see [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md)).
 
 ---
 

@@ -132,7 +132,7 @@
 2. **`tailscale-networking.md`** — *New*. Tailnet join, ACLs, MagicDNS, service discovery, and examples of private reverse proxying from Caddy → GPU-01.
 3. **`security-headers-csp.md`** — *New*. Hardened headers (CSP, HSTS, XFO, COOP/COEP), with Caddy and Cloudflare Pages examples.
 4. **`backups-runbook.md`** — *New*. Postgres PITR with WAL-G, MinIO versioning, restore rehearsal, cron examples.
-5. **`observability.md`** — *New*. Minimal OTel → Prometheus (metrics), Loki (logs), Sentry (traces/errors) + Grafana dashboards.
+5. **[Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md)** — *New*. Minimal OTel → Prometheus (metrics), Loki (logs), Sentry (traces/errors) + Grafana dashboards.
 6. **`openapi/openapi.yaml`** — *New*. Full OpenAPI (events, ingestion, admin, health) used by schemathesis. Served by `api/openapi.ts` at `/api/openapi.json`.
 7. **`api/openapi.ts`** — *New*. Static JSON serving of compiled OpenAPI.
 8. **`project-baseline-index.md`**\*\* (this file)\*\* ▲ — Introduces Dual‑Track plan, multi-host topology, and authoritative order of work.
@@ -148,7 +148,7 @@
 
 **PR-0 — Create Track A docs**
 
-- Add `infra-vps-runbook.md`, `tailscale-networking.md`, `security-headers-csp.md`, `backups-runbook.md`, `observability.md` with checklists and output tables.
+- Add `infra-vps-runbook.md`, `tailscale-networking.md`, `security-headers-csp.md`, `backups-runbook.md`, [Observability (v1) runbook](observability_md_v_1_otel_→_prometheus_loki_grafana_sentry_errors_traces.md) with checklists and output tables.
 
 **PR-0.1 — Host mapping & GPU worker lane**
 
