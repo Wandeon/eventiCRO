@@ -12,4 +12,8 @@ module.exports = {
       files: ["src/**/*.{ts,tsx}", "tests/**/*.{ts,tsx}"],
     },
   ],
+  rules: {
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+  },
 };

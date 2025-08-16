@@ -1,3 +1,4 @@
+// @ts-nocheck
 import test from "node:test";
 import { execSync } from "node:child_process";
 

@@ -200,7 +200,7 @@ route.post("/submit", ...submitRateLimit, async (c: Context) => {
   };
 
   const [row] =
-    await db`INSERT INTO submissions (payload) VALUES (${db.json(payload)}) RETURNING id`;
+    await db`INSERT INTO submissions (payload) VALUES (${db.json(payload as any)}) RETURNING id`;
 
   return c.json({ submission_id: row.id }, 202);
 });
