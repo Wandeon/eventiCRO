@@ -1,12 +1,31 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
 
-  onMount(async () => {
-    if ('serviceWorker' in navigator) {
-      const reg = await navigator.serviceWorker.register('/sw.js');
-      if (reg && reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-    }
-  });
 </script>
 
-<slot />
+<header class="header">
+  <nav>
+    <a href="/">EventiCRO</a>
+    <a href="/about">About</a>
+  </nav>
+</header>
+
+<main class="content">
+  <slot />
+</main>
+
+<style>
+  .header {
+    background: #2563eb;
+    color: white;
+    padding: 1rem;
+  }
+  .header a {
+    color: white;
+    margin-right: 1rem;
+    text-decoration: none;
+  }
+  .content {
+    padding: 1rem;
+  }
+</style>
+
