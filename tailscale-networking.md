@@ -122,7 +122,7 @@ Use MagicDNS names in app configs and envs:
 - `MEDIA_SERVICE_URL=http://gpu-01.tailnet.local:8088`
 - `CRAWL4AI_URL=http://gpu-01.tailnet.local:8089`
 
-This matches the **Outputs** table in `infra-vps-runbook.md` and the envs referenced in `project-baseline-index.md`.
+This matches the values recorded in [track-a-outputs.md](track-a-outputs.md) and the envs referenced in `project-baseline-index.md`.
 
 ---
 

@@ -12,7 +12,7 @@
 
 ## 0) Inputs (from Track‑A Outputs)
 
-Fill these from `infra-vps-runbook.md → Outputs`:
+Fill these from [track-a-outputs.md](track-a-outputs.md):
 
 - `APP_BASE_URL` (e.g., `https://app.example.com`)
 - `API_BASE_URL` (e.g., `https://api.example.com` or same host)
