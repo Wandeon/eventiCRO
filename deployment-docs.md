@@ -42,7 +42,7 @@ Populate from [track-a-outputs.md](track-a-outputs.md). Store these in your CI s
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
+      "test": "pnpm run test:integration && pnpm run test:e2e",
     "build:ui": "vite build",                     
     "build:sw": "workbox injectManifest",
     "build:api": "tsc -p api/tsconfig.json",
@@ -52,11 +52,12 @@ Populate from [track-a-outputs.md](track-a-outputs.md). Store these in your CI s
     "test:integration": "schemathesis run --checks all --rate-limit=50 --hypothesis-max-examples=50 --base-url=$API_BASE_URL $API_BASE_URL/openapi.json",
     "test:e2e": "playwright test",
 
-    "ci": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run test:openapi && pnpm run build && pnpm run test:integration && pnpm run test:e2e"
+      "ci": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run test:openapi && pnpm run build"
   }
 }
 ```
 
+ - `test` runs the integration (`test:integration`) and end-to-end (`test:e2e`) suites in sequence.
  - `build:sw` assumes you wired [Workbox](frontend-ui-pwa.md#7-pwa--offline-workbox-v7) in `frontend-ui-pwa.md`.
  - `test:integration` points to the served artifact from `api/openapi.ts` at `/openapi.json`. If the API lives under `/api`, use `$API_BASE_URL/openapi.json` (e.g., `https://api.example.com/openapi.json`).
 
