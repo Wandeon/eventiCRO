@@ -43,7 +43,7 @@ declare module "bullmq" {
     url?: string;
     [key: string]: any;
   }
-  export class Worker<T = any> {
+  export class Worker {
     constructor(...args: any[]);
   }
 }
